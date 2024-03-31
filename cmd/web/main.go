@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
@@ -13,8 +14,9 @@ import (
 )
 
 type application struct {
-	logger   *slog.Logger
-	snippets *models.SnippetModel
+	logger        *slog.Logger
+	snippets      *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -34,12 +36,21 @@ func main() {
 	}
 	defer db.Close()
 
-	// dependency injection
-	app := &application{
-		logger:   logger,
-		snippets: &models.SnippetModel{DB: db},
+	// init new template cache
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
 	}
 
+	// dependency injection
+	app := &application{
+		logger:        logger,
+		snippets:      &models.SnippetModel{DB: db},
+		templateCache: templateCache,
+	}
+
+	// start the server
 	logger.Info("Starting server", "addr", *addr)
 
 	err = http.ListenAndServe(*addr, app.routes())
