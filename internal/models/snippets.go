@@ -18,16 +18,19 @@ type SnippetModel struct {
 	DB *sql.DB
 }
 
-func (m *SnippetModel) Insert(title string, content string, expires int) error {
+func (m *SnippetModel) Insert(title string, content string, expires int) (int, error) {
 	stmt := `INSERT INTO snippets(title, content, created, expires)
-					 VALUES($1, $2, current_timestamp, current_timestamp + make_interval(days := $3))`
+					 VALUES($1, $2, current_timestamp, current_timestamp + make_interval(days := $3)) RETURNING id`
 
-	_, err := m.DB.Exec(stmt, title, content, expires)
+	row := m.DB.QueryRow(stmt, title, content, expires)
+	var id int
+
+	err := row.Scan(&id)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return id, nil
 }
 
 func (m *SnippetModel) Get(id int) (Snippet, error) {
