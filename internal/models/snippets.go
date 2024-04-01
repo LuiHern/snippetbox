@@ -20,25 +20,26 @@ type SnippetModel struct {
 
 func (m *SnippetModel) Insert(title string, content string, expires int) (int, error) {
 	stmt := `INSERT INTO snippets(title, content, created, expires)
-					 VALUES($1, $2, current_timestamp, current_timestamp + make_interval(days := $3)) 
-					 RETURNING id`
+					 VALUES(?, ?, CURRENT_TIMESTAMP, DATETIME(CURRENT_TIMESTAMP, '+' || ? || ' DAYS'))`
 
-	row := m.DB.QueryRow(stmt, title, content, expires)
-	var id int
-
-	err := row.Scan(&id)
+	row, err := m.DB.Exec(stmt, title, content, expires)
 	if err != nil {
 		return 0, err
 	}
 
-	return id, nil
+	id, err := row.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
 
 func (m *SnippetModel) Get(id int) (Snippet, error) {
 	stmt := `SELECT id, title, content, created, expires 
 				   FROM snippets 
 				   WHERE expires > CURRENT_TIMESTAMP
-	         AND id = $1`
+	         AND id = ?`
 
 	// query for one row, errors are handled when scan() is called
 	row := m.DB.QueryRow(stmt, id)

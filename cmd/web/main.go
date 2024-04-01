@@ -10,7 +10,7 @@ import (
 
 	"snippetbox.betocodes.io/internal/models"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type application struct {
@@ -20,9 +20,10 @@ type application struct {
 }
 
 func main() {
+	os.Remove("sqlite.db")
 	// config flags
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", os.Getenv("DATABASE_URL"), "DB data source name")
+	dsn := flag.String("dsn", "sqlite.db", "DB data source name")
 	flag.Parse()
 
 	// logger
@@ -35,6 +36,11 @@ func main() {
 		os.Exit(1)
 	}
 	defer db.Close()
+	err = loadSchema(db)
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
 
 	// init new template cache
 	templateCache, err := newTemplateCache()
@@ -61,7 +67,7 @@ func main() {
 // The openDB() function wraps sql.Open() and returns a sql.DB connection pool
 // for a given DSN.
 func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("pgx", dsn)
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -73,4 +79,21 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func loadSchema(db *sql.DB) error {
+	schema := `CREATE TABLE snippets (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             title VARCHAR(100) NOT NULL,
+             content TEXT NOT NULL,
+             created TIMESTAMP NOT NULL,
+             expires TIMESTAMP NOT NULL
+  )`
+
+	_, err := db.Exec(schema)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

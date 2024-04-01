@@ -1,2 +1,3 @@
 .idea
 scripts/psql_connect.sh
+*.db
