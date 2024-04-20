@@ -1,2 +1,2 @@
 .idea
-scripts/psql_connect.sh
+scripts/dbconnect.sh
