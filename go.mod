@@ -3,6 +3,7 @@ module snippetbox.betocodes.io
 go 1.22.1
 
 require (
+	github.com/go-playground/form/v4 v4.2.1
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/justinas/alice v1.2.0
 )
