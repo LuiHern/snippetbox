@@ -3,8 +3,9 @@ package main
 import (
 	"html/template"
 	"path/filepath"
-	"snippetbox.betocodes.io/internal/models"
 	"time"
+
+	"snippetbox.betocodes.io/internal/models"
 )
 
 // templateData type to hold any dynamic data we want to pass to our HTML templates
@@ -13,6 +14,7 @@ type templateData struct {
 	Snippet     models.Snippet
 	Snippets    []models.Snippet
 	Form        any
+	Flash       string
 }
 
 func humanDate(t time.Time) string {
