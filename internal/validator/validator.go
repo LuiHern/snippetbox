@@ -11,12 +11,17 @@ var EMAILRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](
 
 // Validator struct to hold a map of validation errors
 type Validator struct {
-	FieldErrors map[string]string
+	NonFieldErrors []string
+	FieldErrors    map[string]string
 }
 
 // Valid returns true if the map is empty
 func (v *Validator) Valid() bool {
-	return len(v.FieldErrors) == 0
+	return len(v.FieldErrors) == 0 && len(v.NonFieldErrors) == 0
+}
+
+func (v *Validator) AddNonFieldError(message string) {
+	v.NonFieldErrors = append(v.NonFieldErrors, message)
 }
 
 func (v *Validator) AddFieldError(key, message string) {
