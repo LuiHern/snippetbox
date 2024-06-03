@@ -30,7 +30,7 @@ type application struct {
 
 func main() {
 	// config flags
-	addr := flag.String("addr", ":4000", "HTTP network address")
+	addr := flag.String("addr", ":8000", "HTTP network address")
 	dsn := flag.String("dsn", os.Getenv("DATABASE_URL"), "DB datasource name")
 	flag.Parse()
 
