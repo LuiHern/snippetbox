@@ -4,8 +4,8 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"flag"
+	"fmt"
 	"html/template"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -33,7 +33,7 @@ type application struct {
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		fmt.Println("Error loading .env file")
 	}
 }
 
