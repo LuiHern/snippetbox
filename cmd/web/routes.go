@@ -4,19 +4,16 @@ import (
 	"net/http"
 
 	"github.com/justinas/alice"
+	"snippetbox.betocodes.io/ui"
 )
 
 func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
-	fileserver := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("GET /static/", http.StripPrefix("/static", fileserver))
+	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
 	// dynamic route middleware chain
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
-
-	// protected route middleware chain
-	protected := dynamic.Append(app.requireAuthentication)
 
 	// unprotected routes using dynamic middleware chain
 	mux.Handle("GET /{$}", dynamic.ThenFunc(app.home))
@@ -25,6 +22,9 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /user/signup", dynamic.ThenFunc(app.userSignupPost))
 	mux.Handle("GET /user/login", dynamic.ThenFunc(app.userLogin))
 	mux.Handle("POST /user/login", dynamic.ThenFunc(app.userLoginPost))
+
+	// protected route middleware chain
+	protected := dynamic.Append(app.requireAuthentication)
 
 	// protected routes using protected middleware chain which require authorization
 	mux.Handle("GET /snippet/create", protected.ThenFunc(app.snippetCreate))

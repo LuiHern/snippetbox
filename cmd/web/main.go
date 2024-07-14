@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"flag"
 	"html/template"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"github.com/alexedwards/scs/postgresstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
+	"github.com/joho/godotenv"
 
 	"snippetbox.betocodes.io/internal/models"
 
@@ -26,6 +28,13 @@ type application struct {
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
+}
+
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 }
 
 func main() {
