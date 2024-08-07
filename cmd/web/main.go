@@ -43,10 +43,8 @@ func main() {
 	dsn := flag.String("dsn", os.Getenv("DATABASE_URL"), "DB datasource name")
 	flag.Parse()
 
-	// init logger
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	// connect to db
 	db, err := openDB(*dsn)
 	if err != nil {
 		logger.Error(err.Error())
@@ -54,13 +52,12 @@ func main() {
 	}
 	defer db.Close()
 
-	// init new template cache
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
-	// init decoder
+
 	formDecoder := form.NewDecoder()
 
 	// init sessionManager
@@ -83,7 +80,6 @@ func main() {
 		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
 	}
 
-	// start the server
 	srv := &http.Server{
 		Addr:         *addr,
 		Handler:      app.routes(),
@@ -94,7 +90,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	logger.Info("Starting server", "addr", *addr)
+	logger.Info("starting server", "addr", srv.Addr)
 
 	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	logger.Error(err.Error())

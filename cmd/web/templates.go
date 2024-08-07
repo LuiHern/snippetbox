@@ -11,6 +11,7 @@ import (
 )
 
 // templateData type to hold any dynamic data we want to pass to our HTML templates
+
 type templateData struct {
 	CurrentYear     int
 	Snippet         models.Snippet
@@ -25,6 +26,7 @@ func humanDate(t time.Time) string {
 	if t.IsZero() {
 		return ""
 	}
+
 	return t.UTC().Format("02 Jan 2006 at 15:04")
 }
 
@@ -56,5 +58,6 @@ func newTemplateCache() (map[string]*template.Template, error) {
 
 		cache[name] = ts
 	}
+
 	return cache, nil
 }
