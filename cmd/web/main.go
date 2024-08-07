@@ -30,14 +30,16 @@ type application struct {
 	sessionManager *scs.SessionManager
 }
 
-func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println("Error loading .env file")
-	}
-}
+// func init() {
+// 	err := godotenv.Load(".env")
+// 	if err != nil {
+// 		fmt.Println("Error loading .env file")
+// 	}
+// }
 
 func main() {
+	loadEnv()
+
 	// config flags
 	addr := flag.String("addr", ":8000", "HTTP network address")
 	dsn := flag.String("dsn", os.Getenv("DATABASE_URL"), "DB datasource name")
@@ -112,4 +114,11 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func loadEnv() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
 }
