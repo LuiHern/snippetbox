@@ -3,12 +3,19 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"strings"
+	"time"
+
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
-	"strings"
-	"time"
 )
+
+type UserModelInterface interface {
+	Insert(name, email, password string) error
+	Authenticate(email, password string) (int, error)
+	Exists(id int) (bool, error)
+}
 
 type User struct {
 	ID             int

@@ -31,7 +31,7 @@ func TestHumanDate(t *testing.T) {
 		},
 	}
 
-	// iterate over test cases
+	// iterate over table test cases
 	for _, tt := range tests {
 		// Use the t.Run() function to run a sub-test for each test case. The
 		// first parameter to this is the name of the test (which is used to

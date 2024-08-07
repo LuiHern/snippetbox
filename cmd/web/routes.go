@@ -12,6 +12,9 @@ func (app *application) routes() http.Handler {
 
 	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
 
+	// ping
+	mux.HandleFunc("GET /ping", ping)
+
 	// dynamic route middleware chain
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
